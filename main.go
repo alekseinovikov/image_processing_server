@@ -77,6 +77,31 @@ func writeFile(bytes []byte, w http.ResponseWriter, r http.Request) {
 	w.Write(bytes)
 }
 
+// Gets the params from the request
+func getParams(r http.Request) (width int, height int) {
+	width = 100
+	height = 100
+
+	params := r.URL.Query()
+	if nil != params["width"] {
+		param := params["width"][0]
+		value, err := strconv.Atoi(param)
+		if nil == err {
+			width = value
+		}
+	}
+
+	if nil != params["height"] {
+		param := params["height"][0]
+		value, err := strconv.Atoi(param)
+		if nil == err {
+			height = value
+		}
+	}
+
+	return
+}
+
 // Handler for resizing image
 func resizeHandler(w http.ResponseWriter, r *http.Request) {
 	if nil != checkMethodPOSTAndWriteAnswer(w, r) {
@@ -89,7 +114,8 @@ func resizeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bytes, err := resizing.Resize(file)
+	width, height := getParams(*r)
+	bytes, err := resizing.Resize(file, width, height)
 	if nil != err {
 		writeError(http.StatusInternalServerError, err.Error(), w)
 		return
@@ -110,7 +136,8 @@ func thumbnailHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bytes, err := resizing.Thumbnail(file)
+	width, height := getParams(*r)
+	bytes, err := resizing.Thumbnail(file, width, height)
 	if nil != err {
 		writeError(http.StatusInternalServerError, err.Error(), w)
 		return

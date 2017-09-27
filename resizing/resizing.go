@@ -16,13 +16,13 @@ func getImage(file multipart.File) (image.Image, error) {
 }
 
 // Resizing file
-func Resize(file multipart.File) ([]byte, error) {
+func Resize(file multipart.File, width int, height int) ([]byte, error) {
 	img, err := getImage(file)
 	if nil != err {
 		return nil, err
 	}
 
-	newImage := resize.Resize(100, 100, img, resize.Lanczos3)
+	newImage := resize.Resize(uint(width), uint(height), img, resize.Lanczos3)
 
 	buf := new(bytes.Buffer)
 	err = jpeg.Encode(buf, newImage, nil)
@@ -30,13 +30,13 @@ func Resize(file multipart.File) ([]byte, error) {
 }
 
 // Making thumbnail
-func Thumbnail(file multipart.File) ([]byte, error) {
+func Thumbnail(file multipart.File, width int, height int) ([]byte, error) {
 	img, err := getImage(file)
 	if nil != err {
 		return nil, err
 	}
 
-	newImage := resize.Thumbnail(100, 100, img, resize.Lanczos3)
+	newImage := resize.Thumbnail(uint(width), uint(height), img, resize.Lanczos3)
 
 	buf := new(bytes.Buffer)
 	err = jpeg.Encode(buf, newImage, nil)
